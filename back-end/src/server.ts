@@ -1,15 +1,15 @@
-import express, { json, Request, Response } from 'express';
-import { echo } from './newecho';
-import morgan from 'morgan';
-import config from './config.json';
-import cors from 'cors';
-import errorHandler from 'middleware-http-errors';
-import YAML from 'yaml';
-import sui from 'swagger-ui-express';
-import fs from 'fs';
-import path from 'path';
-import process from 'process';
-import { createClient } from '@vercel/kv';
+import express, { json, Request, Response } from "express";
+import morgan from "morgan";
+import config from "./config.json";
+import cors from "cors";
+import errorHandler from "middleware-http-errors";
+import YAML from "yaml";
+import sui from "swagger-ui-express";
+import fs from "fs";
+import path from "path";
+import process from "process";
+import dotenv from 'dotenv';
+dotenv.config()
 
 // Set up web app
 const app = express();
@@ -18,29 +18,39 @@ app.use(json());
 // Use middleware that allows for access from other domains
 app.use(cors());
 // for logging errors (print to terminal)
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 
-app.use(express.static('public'));
+app.use(express.static("public"));
 
-const KV_REST_API_URL="https://good-kingfish-38504.kv.vercel-storage.com"
-const KV_REST_API_TOKEN="AZZoASQgYTY1ODA0YjktZDA5ZS00MmY5LWJlMGMtOTg0YWQ2NWI1NWQ1MDkyM2IzMzAxOWQ1NDVjOTgwNjhhMWNlNjQ1NzhiMTE="
-const database = createClient({
-  url: KV_REST_API_URL,
-  token: KV_REST_API_TOKEN,
-});
+const { MongoClient, ServerApiVersion } = require("mongodb");
+console.log(process.env.DB_URI);
+const uri = process.env.DB_URI;
+const client = new MongoClient(uri);
+const dbName = "academate"; // Your DB name
+
+async function main() {
+  console.log("Trying to connect MongoDB server");
+  await client.connect();
+  console.log("Connected successfully to MongoDB server");
+
+  const db = client.db(dbName);
+  const collection = db.collection("users"); // Create/Access a collection
+}
+
+main().catch(console.error);
 
 // for producing the docs that define the API
-const file = fs.readFileSync(path.join(process.cwd(), 'swagger.yaml'), 'utf8');
-app.get('/', (req: Request, res: Response) => res.redirect('/docs'));
+const file = fs.readFileSync(path.join(process.cwd(), "swagger.yaml"), "utf8");
+app.get("/", (req: Request, res: Response) => res.redirect("/docs"));
 app.use(
-  '/docs',
+  "/docs",
   sui.serve,
   sui.setup(YAML.parse(file), {
-    swaggerOptions: { docExpansion: config.expandDocs ? 'full' : 'list' },
+    swaggerOptions: { docExpansion: config.expandDocs ? "full" : "list" },
   })
 );
 const PORT: number = parseInt(process.env.PORT || config.port);
-const HOST: string = process.env.IP || 'localhost';
+const HOST: string = process.env.IP || "localhost";
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
@@ -70,6 +80,6 @@ const server = app.listen(PORT, HOST, () => {
 });
 
 // For coverage, handle Ctrl+C gracefully
-process.on('SIGINT', () => {
-  server.close(() => console.log('Shutting down server gracefully.'));
+process.on("SIGINT", () => {
+  server.close(() => console.log("Shutting down server gracefully."));
 });
