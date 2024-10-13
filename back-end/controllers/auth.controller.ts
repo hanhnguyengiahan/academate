@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Token } from '../types/types';
 import User from '../models/user.model';
+import Session from '../models/session.model';
 import { sign, decode, verify } from 'jsonwebtoken';
 import { compare, hash } from 'bcrypt';
 import dotenv from 'dotenv';
@@ -19,6 +20,9 @@ const register = async (req: Request, res: Response) => {
             { id: newUser._id }, // Payload (data to include in the token)
             SECRET_KEY // Secret key to sign the token
         );
+        await Session.create({
+            token
+        });
         res.status(200).json({token: token});
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -43,11 +47,30 @@ const login = async (req: Request, res: Response) => {
             { id: user._id }, 
             SECRET_KEY
         );
-
+        await Session.create({
+            token
+        });
         res.status(200).json({ token });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-export { register, login };
+const logout = async (req: Request, res: Response) => {
+    try {
+        const { token } = req.body;
+        
+        const validSession = await Session.findOne({ token });
+        if (!validSession) {
+            return res.status(401).json({ message: 'Invalid credentatials' });
+        }
+
+        await Session.findOneAndDelete({
+            token
+        });
+        res.status(200).json({});
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+export { register, login, logout };
