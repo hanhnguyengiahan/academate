@@ -9,17 +9,17 @@ const UserSchema = new mongoose.Schema({
   email: {
     type: String,
     match: /^z\d{7}@ad\.unsw\.edu\.au$/,
-    required: true
+    required: true,
   },
 
   password: {
     type: String,
-    required: true
+    required: true,
   },
 
   gender: {
     type: String,
-    required: true
+    required: true,
   },
 
   matchingCards: [
@@ -32,16 +32,16 @@ const UserSchema = new mongoose.Schema({
   friends: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    }
+      ref: 'User',
+    },
   ],
 
   requests: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'FriendRequest'
-    }
-  ]
+      ref: 'FriendRequest',
+    },
+  ],
 });
-const User = mongoose.model("User", UserSchema);
+const User = mongoose.model('User', UserSchema);
 export default User;
