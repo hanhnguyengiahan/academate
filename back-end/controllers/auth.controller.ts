@@ -50,5 +50,4 @@ const login = async (req: Request, res: Response) => {
     }
 };
 
-const logout
 export { register, login };
