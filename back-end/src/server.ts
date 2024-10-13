@@ -1,56 +1,43 @@
-import express, { json, Request, Response } from "express";
-import morgan from "morgan";
-import config from "./config.json";
-import cors from "cors";
-import errorHandler from "middleware-http-errors";
-import YAML from "yaml";
-import sui from "swagger-ui-express";
-import fs from "fs";
-import path from "path";
-import process from "process";
+import express, { json, Request, Response } from 'express';
+import morgan from 'morgan';
+import config from './config.json';
+import cors from 'cors';
+import errorHandler from 'middleware-http-errors';
+import YAML from 'yaml';
+import sui from 'swagger-ui-express';
+import fs from 'fs';
+import path from 'path';
+import process from 'process';
 import dotenv from 'dotenv';
-dotenv.config()
+import mongoose from 'mongoose';
+
+dotenv.config();
 
 // Set up web app
 const app = express();
+const PORT: number = parseInt(config.port);
+const HOST: string = process.env.IP || 'localhost';
+
+// for producing swagger.yaml that define the API
+const file = fs.readFileSync(path.join(process.cwd(), 'swagger.yaml'), 'utf8');
+app.get('/', (req: Request, res: Response) => res.redirect('/docs'));
+app.use(
+  '/docs',
+  sui.serve,
+  sui.setup(YAML.parse(file), {
+    swaggerOptions: { docExpansion: config.expandDocs ? 'full' : 'list' },
+  })
+);
+
 // Use middleware that allows us to access the JSON body of requests
 app.use(json());
 // Use middleware that allows for access from other domains
 app.use(cors());
 // for logging errors (print to terminal)
-app.use(morgan("dev"));
-
-app.use(express.static("public"));
-
-const { MongoClient, ServerApiVersion } = require("mongodb");
-console.log(process.env.DB_URI);
-const uri = process.env.DB_URI;
-const client = new MongoClient(uri);
-const dbName = "academate"; // Your DB name
-
-async function main() {
-  console.log("Trying to connect MongoDB server");
-  await client.connect();
-  console.log("Connected successfully to MongoDB server");
-
-  const db = client.db(dbName);
-  const collection = db.collection("users"); // Create/Access a collection
-}
-
-main().catch(console.error);
-
-// for producing the docs that define the API
-const file = fs.readFileSync(path.join(process.cwd(), "swagger.yaml"), "utf8");
-app.get("/", (req: Request, res: Response) => res.redirect("/docs"));
-app.use(
-  "/docs",
-  sui.serve,
-  sui.setup(YAML.parse(file), {
-    swaggerOptions: { docExpansion: config.expandDocs ? "full" : "list" },
-  })
-);
-const PORT: number = parseInt(process.env.PORT || config.port);
-const HOST: string = process.env.IP || "localhost";
+app.use(morgan('dev'));
+app.use(express.static('public'));
+// For handling errors
+app.use(errorHandler());
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
@@ -70,8 +57,6 @@ app.use((req: Request, res: Response) => {
   `;
   res.status(404).json({ error });
 });
-// For handling errors
-app.use(errorHandler());
 
 // start server
 const server = app.listen(PORT, HOST, () => {
@@ -79,7 +64,12 @@ const server = app.listen(PORT, HOST, () => {
   console.log(`⚡️ Server started on port ${PORT} at ${HOST}`);
 });
 
+// Setup mongoose
+mongoose.connect(process.env.DB_URI)
+  .then(() => console.log('Connected to MongoDB!'));
+
 // For coverage, handle Ctrl+C gracefully
-process.on("SIGINT", () => {
-  server.close(() => console.log("Shutting down server gracefully."));
+process.on('SIGINT', () => {
+  server.close(() => console.log('Shutting down server gracefully.'));
+  mongoose.disconnect();
 });
