@@ -11,6 +11,11 @@ import process from 'process';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
+// import routes
+import userRoute from '../routes/user.route';
+import authRoute from '../routes/auth.route';
+
+// Setup dotenv file
 dotenv.config();
 
 // Set up web app
@@ -39,6 +44,10 @@ app.use(express.static('public'));
 // For handling errors
 app.use(errorHandler());
 
+// use routes
+app.use('/auth', authRoute);
+app.use('/user', userRoute);
+
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================
@@ -65,7 +74,8 @@ const server = app.listen(PORT, HOST, () => {
 });
 
 // Setup mongoose
-mongoose.connect(process.env.DB_URI)
+mongoose
+  .connect(process.env.DB_URI)
   .then(() => console.log('Connected to MongoDB!'));
 
 // For coverage, handle Ctrl+C gracefully
