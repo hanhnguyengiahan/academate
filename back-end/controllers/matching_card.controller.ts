@@ -69,6 +69,28 @@ const updateCard = async (req: Request, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 };
-// const deleteCard = (req: Request, res: Response) => {};
+const deleteCard = async (req: Request, res: Response) => {
+  try {
+    const { token, _id } = req.body;
 
-export { createCard, readCard, updateCard };
+    const validSession = await Session.findOne({ token });
+    if (!validSession) {
+      return res.status(401).json({ message: 'Invalid credentatials' });
+    }
+
+    // use lean() option so it returns a Js Object only, not a Mongoose Document (which contains extra stuff we dont care)
+    const existingCard = await MatchingCard.findByIdAndDelete(_id).lean();
+
+    if (!existingCard) {
+      return res.status(401).json({ message: 'Card does not exist' });
+    }
+
+    res.status(200).json({
+      message: 'Card deleted successfully',
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export { createCard, readCard, updateCard, deleteCard };
