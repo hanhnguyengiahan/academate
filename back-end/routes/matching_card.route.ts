@@ -9,8 +9,8 @@ import {
 const router = express.Router();
 
 router.post('/', createCard);
-router.get('/', readCard);
+router.post('/read', readCard);
 router.put('/', updateCard);
-router.delete('/', deleteCard);
+router.post('/delete', deleteCard);
 
 export default router;
