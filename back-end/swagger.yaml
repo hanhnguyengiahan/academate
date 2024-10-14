@@ -94,7 +94,7 @@ paths:
           schema: 
             type: string
             example: jsA1Hjs3amK4han5slpq
-        - name: match_card_id
+        - name: _id
           in: query
           required: true
           schema: 
@@ -135,7 +135,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Match-Create'
+              $ref: '#/components/schemas/Match-Update'
       responses:
         '200':
           description: Matching card updated successfully
@@ -156,7 +156,7 @@ paths:
           schema: 
             type: string
             example: jsA1Hjs3amK4han5slpq
-        - name: match_card_id
+        - name: _id
           in: query
           required: true
           schema: 
@@ -228,10 +228,28 @@ components:
         objective:
           type: string
           example: I WANNA GET HD IN DIS COURSE PLZ COLLAB
+    Match-Update:
+      type: object
+      properties:
+        token:
+          type: string
+          example: jsA1Hjs3amK4han5slpq
+        _id:
+          type: string
+          example: jsA1Hjs3amK4han5slpq
+        course_code:
+          type: string
+          example: COMP1531
+        grade:
+          type: string
+          example: HD
+        objective:
+          type: string
+          example: I WANNA GET HD IN DIS COURSE PLZ COLLAB
     Match-Create-Success:
       type: object
       properties:
-        match_card_id:
+        _id:
           type: string
           example: jsA1Hjs3amK4han5slpq
         course_code:

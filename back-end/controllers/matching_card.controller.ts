@@ -16,7 +16,7 @@ const createCard = async (req: Request, res: Response) => {
     });
 
     res.status(200).json({
-      newCard,
+      ...newCard.toObject(),
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -25,7 +25,7 @@ const createCard = async (req: Request, res: Response) => {
 
 const readCard = async (req: Request, res: Response) => {
   try {
-    const { token, match_card_id } = req.body;
+    const { token, _id } = req.body;
 
     const validSession = await Session.findOne({ token });
     if (!validSession) {
@@ -33,13 +33,10 @@ const readCard = async (req: Request, res: Response) => {
     }
 
     // use lean() option so it returns a Js Object only, not a Mongoose Document (which contains extra stuff we dont care)
-    const { _id, ...other } = await MatchingCard.findOne({
-      match_card_id,
-    }).lean();
+    const card = await MatchingCard.findById(_id).lean();
 
     res.status(200).json({
-      match_card_id: _id,
-      ...other,
+      ...card,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -47,7 +44,7 @@ const readCard = async (req: Request, res: Response) => {
 };
 const updateCard = async (req: Request, res: Response) => {
   try {
-    const { token, match_card_id, ...newCardInfo } = req.body;
+    const { token, _id, ...newCardInfo } = req.body;
 
     const validSession = await Session.findOne({ token });
     if (!validSession) {
@@ -55,15 +52,18 @@ const updateCard = async (req: Request, res: Response) => {
     }
 
     // use lean() option so it returns a Js Object only, not a Mongoose Document (which contains extra stuff we dont care)
-    await MatchingCard.findByIdAndUpdate(match_card_id, {
+    const existingCard = await MatchingCard.findByIdAndUpdate(_id, {
       ...newCardInfo,
     }).lean();
 
-    const { _id, ...other } = await MatchingCard.findById(match_card_id).lean();
+    if (!existingCard) {
+      return res.status(401).json({ message: 'Card does not exist' });
+    }
+
+    const updatedCard = await MatchingCard.findById(_id).lean();
 
     res.status(200).json({
-      match_card_id: _id,
-      ...other,
+      ...updatedCard,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
