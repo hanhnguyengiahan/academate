@@ -35,6 +35,10 @@ const readCard = async (req: Request, res: Response) => {
     // use lean() option so it returns a Js Object only, not a Mongoose Document (which contains extra stuff we dont care)
     const card = await MatchingCard.findById(_id).lean();
 
+    if (!card) {
+      return res.status(401).json({ message: 'Card does not exist' });
+    }
+
     res.status(200).json({
       ...card,
     });
