@@ -80,26 +80,18 @@ paths:
       responses:
         '200':
           description: User logged out successfully
-  /match:
-    get:
+  /match/read:
+    post:
       tags:
         - match
-      summary: Read info from a matching card
+      summary: Get info of a matching card
       description: ''
       operationId: readMatch
-      parameters:
-        - name: token
-          in: query
-          required: true
-          schema: 
-            type: string
-            example: jsA1Hjs3amK4han5slpq
-        - name: match_card_id
-          in: query
-          required: true
-          schema: 
-            type: string
-            example: jsA1Hjs3amK4han5slpq
+      requestBody:
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match-Read'
       responses:
         '200':
           description: Matching card created successfully
@@ -107,6 +99,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Match-Create-Success'
+  /match/delete:
+    post:
+        tags:
+          - match
+        summary: Delete a matching card
+        description: ''
+        operationId: deleteMatch
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match-Read'
+        responses:
+          '200':
+            description: Matching card deleted successfully
+  /match:
     post:
       tags:
         - match
@@ -135,7 +143,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Match-Create'
+              $ref: '#/components/schemas/Match-Update'
       responses:
         '200':
           description: Matching card updated successfully
@@ -143,28 +151,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Match-Create-Success'
-    delete:
-      tags:
-        - match
-      summary: Delete a matching card
-      description: ''
-      operationId: deleteMatch
-      parameters:
-        - name: token
-          in: query
-          required: true
-          schema: 
-            type: string
-            example: jsA1Hjs3amK4han5slpq
-        - name: match_card_id
-          in: query
-          required: true
-          schema: 
-            type: string
-            example: jsA1Hjs3amK4han5slpq
-      responses:
-        '200':
-          description: Matching card deleted successfully
+    
 
 
 
@@ -213,6 +200,15 @@ components:
         message:
           type: string
           example: Invalid email or password
+    Match-Read:
+      type: object
+      properties:
+        token:
+          type: string
+          example: jsA1Hjs3amK4han5slpq
+        _id:
+          type: string
+          example: jsA1Hjs3amK4han5slpq
     Match-Create:
       type: object
       properties:
@@ -228,10 +224,28 @@ components:
         objective:
           type: string
           example: I WANNA GET HD IN DIS COURSE PLZ COLLAB
+    Match-Update:
+      type: object
+      properties:
+        token:
+          type: string
+          example: jsA1Hjs3amK4han5slpq
+        _id:
+          type: string
+          example: jsA1Hjs3amK4han5slpq
+        course_code:
+          type: string
+          example: COMP1531
+        grade:
+          type: string
+          example: HD
+        objective:
+          type: string
+          example: I WANNA GET HD IN DIS COURSE PLZ COLLAB
     Match-Create-Success:
       type: object
       properties:
-        match_card_id:
+        _id:
           type: string
           example: jsA1Hjs3amK4han5slpq
         course_code:
