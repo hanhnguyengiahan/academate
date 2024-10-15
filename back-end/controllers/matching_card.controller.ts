@@ -1,7 +1,12 @@
 import { Request, Response } from 'express';
 import MatchingCard from '../models/matching_card.model';
 import Session from '../models/session.model';
+import { verify } from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+dotenv.config();
 
+const SECRET_KEY = process.env.JWT_SECRET;
 const createCard = async (req: Request, res: Response) => {
   try {
     const { token, ...cardInfo } = req.body;
@@ -11,8 +16,12 @@ const createCard = async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Invalid credentatials' });
     }
 
+    const userId = verify(token, SECRET_KEY) as string;
+    console.log(userId);
+
     const newCard = await MatchingCard.create({
       ...cardInfo,
+      userId: new mongoose.mongo.ObjectId(userId),
     });
 
     res.status(200).json({
