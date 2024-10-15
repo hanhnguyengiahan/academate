@@ -13,11 +13,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigation = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,17 +31,17 @@ const LoginPage = () => {
     } else {
       setError("");
       console.log("Login attempted with:", { email, password });
-      // You would typically make an API call here to authenticate the user
+      navigation.push("/dashboard")
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Login</CardTitle>
-          <CardDescription>
-            Enter your credentials to access your account
+          <CardDescription className="cursor-pointer">
+            <Link href="/register">Don't have an account? </Link>
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -79,6 +82,6 @@ const LoginPage = () => {
       </Card>
     </div>
   );
-}
+};
 
 export default LoginPage;

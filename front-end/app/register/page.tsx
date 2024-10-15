@@ -6,48 +6,39 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
 
-const RegisterPage = () => {
-  const [name, setName] = useState("")
+const RegisterPageComponent = () =>{
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
+  const [gender, setGender] = useState("")
   const [error, setError] = useState("")
+  const navigation = useRouter()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Basic form validation
-    if (!name || !email || !password || !confirmPassword) {
+    if (!email || !password || !gender) {
       setError("Please fill in all fields")
-    } else if (password !== confirmPassword) {
-      setError("Passwords do not match")
     } else {
       setError("")
-      console.log("Registration attempted with:", { name, email, password })
-      // You would typically make an API call here to register the user
+      console.log("Registration attempted with:", { email, password, gender })
+      navigation.push("/dashboard")
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Register</CardTitle>
-          <CardDescription>Create a new account</CardDescription>
+          <CardDescription className="cursor-pointer">
+            <Link href="/login">Already have an account? </Link>
+          </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="John Doe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -70,14 +61,21 @@ const RegisterPage = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm Password</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
+              <Label>Gender</Label>
+              <RadioGroup value={gender} onValueChange={setGender} required>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="male" id="male" />
+                  <Label htmlFor="male">Male</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="female" id="female" />
+                  <Label htmlFor="female">Female</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="other" id="other" />
+                  <Label htmlFor="other">Other</Label>
+                </div>
+              </RadioGroup>
             </div>
             {error && (
               <Alert variant="destructive">
@@ -94,4 +92,4 @@ const RegisterPage = () => {
   )
 }
 
-export default RegisterPage
+export default RegisterPageComponent
