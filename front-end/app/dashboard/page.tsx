@@ -3,64 +3,55 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AddMatchingCardComponent } from "@/components/add-matching-card";
 
 // Define the type for our matching card data
 type MatchingCard = {
-  id: string;
-  courseCode: string;
-  aimingGrade: string;
-  objectives: string[];
+  _id: string;
+  course_code: string;
+  grade: string;
+  objective: string;
 };
-
-// Mock data for demonstration
-const mockMatchingCards: MatchingCard[] = [
-  {
-    id: "MC001",
-    courseCode: "CS101",
-    aimingGrade: "A",
-    objectives: [
-      "Master basic programming concepts",
-      "Complete all assignments on time",
-    ],
-  },
-  {
-    id: "MC002",
-    courseCode: "MATH201",
-    aimingGrade: "B+",
-    objectives: ["Improve calculus skills", "Attend all tutorial sessions"],
-  },
-  {
-    id: "MC003",
-    courseCode: "ENG102",
-    aimingGrade: "A-",
-    objectives: [
-      "Enhance essay writing skills",
-      "Participate actively in class discussions",
-    ],
-  },
-  {
-    id: "MC004",
-    courseCode: "PHYS101",
-    aimingGrade: "B",
-    objectives: [
-      "Understand fundamental physics concepts",
-      "Perform well in lab experiments",
-    ],
-  },
-];
 
 const DashboardPageComponent = () => {
   const navigation = useRouter();
   const [showModal, setShowModal] = useState(false);
+  const [matchingCards, setMatchingCards] = useState<MatchingCard[]>([]);
+
+  const token = localStorage.getItem("academateToken");
+
+  if (!token) {
+    navigation.push("/login");
+  }
+
+  useEffect(() => {
+    try {
+      fetch("http://localhost:52533/match/read_all", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token }),
+      }).then(async (response) => {
+        if (response.ok) {
+          const data = await response.json();
+          setMatchingCards(data);
+        } else {
+          const data = await response.json();
+          console.error(data.message);
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }, [token, showModal]);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -84,28 +75,21 @@ const DashboardPageComponent = () => {
               Your Matching Cards
             </h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {mockMatchingCards.map((card) => (
+              {matchingCards.map((card) => (
                 <Card
-                  key={card.id}
+                  key={card._id}
                   className="hover:shadow-lg transition-shadow duration-300"
-                  onClick={() => navigation.push(`/matching/${card.id}`)}
+                  onClick={() => navigation.push(`/matching/${card._id}`)}
                 >
                   <CardHeader>
                     <CardTitle className="flex justify-between items-center">
-                      <span>{card.courseCode}</span>
-                      <Badge variant="secondary">{card.aimingGrade}</Badge>
+                      <span>{card.course_code}</span>
+                      <Badge variant="secondary">{card.grade}</Badge>
                     </CardTitle>
-                    <CardDescription>ID: {card.id}</CardDescription>
-                  </CardHeader>
+                  </CardHeader> 
                   <CardContent>
-                    <h4 className="font-semibold mb-2">Objectives:</h4>
-                    <ul className="list-disc pl-5 space-y-1">
-                      {card.objectives.map((objective, index) => (
-                        <li key={index} className="text-sm text-gray-600">
-                          {objective}
-                        </li>
-                      ))}
-                    </ul>
+                    <h4 className="font-semibold mb-2">Objective:</h4>
+                    <p className="text-sm text-gray-600">{card.objective}</p>
                   </CardContent>
                 </Card>
               ))}

@@ -20,14 +20,23 @@ import {
 } from "@/components/ui/select";
 import { PlusCircle, X } from "lucide-react";
 
-const courseCodes = ["CS101", "MATH201", "ENG102", "PHYS101", "CHEM201"];
-const grades = ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D", "F"];
+const courseCodes = [
+  "COMP1531",
+  "COMP2511",
+  "COMP2521",
+  "COMP3121",
+  "COMP3141",
+  "COMP1511",
+];
+const grades = ["HD", "D", "CR", "PS"];
 
 export const AddMatchingCardComponent = ({ setShow }: { setShow: any }) => {
   const [courseCode, setCourseCode] = useState("");
   const [aimingGrade, setAimingGrade] = useState("");
   const [objectives, setObjectives] = useState<string[]>([]);
   const [newObjective, setNewObjective] = useState("");
+
+  const token = localStorage.getItem("academateToken");
 
   const handleAddObjective = () => {
     if (newObjective.trim()) {
@@ -40,11 +49,35 @@ export const AddMatchingCardComponent = ({ setShow }: { setShow: any }) => {
     setObjectives(objectives.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Here you would typically handle the form submission
     console.log({ courseCode, aimingGrade, objectives });
-    setShow(false);
+    try {
+      fetch("http://localhost:52533/match", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token,
+          course_code: courseCode,
+          grade: aimingGrade,
+          objective: objectives[0],
+        }),
+      }).then(async (response) => {
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          setShow(false);
+        } else {
+          const data = await response.json();
+          console.error(data.message);
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
