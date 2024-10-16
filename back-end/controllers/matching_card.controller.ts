@@ -54,6 +54,31 @@ const readCard = async (req: Request, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+const readAllCard = async (req: Request, res: Response) => {
+  try {
+    const { token } = req.body;
+
+    const validSession = await Session.findOne({ token });
+    if (!validSession) {
+      return res.status(401).json({ message: 'Invalid credentatials' });
+    }
+
+    const payload = verify(token, SECRET_KEY) as JwtPayload;
+
+    // use lean() option so it returns a Js Object only, not a Mongoose Document (which contains extra stuff we dont care)
+    const cards = await MatchingCard.find({
+      userId: payload.id,
+    }).lean();
+
+    console.log(cards);
+
+    res.status(200).json(cards);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const updateCard = async (req: Request, res: Response) => {
   try {
     const { token, _id, ...newCardInfo } = req.body;
@@ -105,4 +130,4 @@ const deleteCard = async (req: Request, res: Response) => {
   }
 };
 
-export { createCard, readCard, updateCard, deleteCard };
+export { createCard, readCard, readAllCard, updateCard, deleteCard };
