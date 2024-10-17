@@ -71,8 +71,6 @@ const readAllCard = async (req: Request, res: Response) => {
       userId: payload.id,
     }).lean();
 
-    console.log(cards);
-
     res.status(200).json(cards);
   } catch (error) {
     res.status(500).json({ message: error.message });
