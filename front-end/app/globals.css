@@ -12,6 +12,21 @@ body {
   }
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+::-webkit-scrollbar {
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1; /* Light gray */
+  border-radius: 4px;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
