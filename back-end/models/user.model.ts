@@ -31,9 +31,15 @@ const UserSchema = new mongoose.Schema({
 
   friends: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+      matchingCard: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MatchingCard',
+      }
+    }
   ],
 
   sent_requests: [
@@ -42,13 +48,13 @@ const UserSchema = new mongoose.Schema({
       ref: 'FriendRequest',
     },
   ],
-  
+
   received_requests: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'FriendRequest',
-    }
-  ]
+    },
+  ],
 });
 const User = mongoose.model('User', UserSchema);
 export default User;

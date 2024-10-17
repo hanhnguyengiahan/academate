@@ -11,10 +11,10 @@ const FriendRequestSchema = new mongoose.Schema({
     ref: 'User',
   },
 
-  status: {
-    type: String,
-    enum: ['Pending', 'Accepted'],
-  },
+  matchingCard : {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'MatchingCard',
+  }
 });
 const FriendRequest = mongoose.model("FriendRequest", FriendRequestSchema);
 

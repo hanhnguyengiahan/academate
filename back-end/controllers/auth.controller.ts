@@ -9,6 +9,10 @@ dotenv.config();
 const SECRET_KEY = process.env.JWT_SECRET;
 const register = async (req: Request, res: Response) => {
   try {
+    const emailUsed = await User.findOne({ email: req.body.email});
+    if (emailUsed) {
+      return res.status(400).json({error: 'Email address used by another user'});
+    }
     const hashedPassword = await hash(req.body.password, 10);
     const newUser = await User.create({
       ...req.body,
