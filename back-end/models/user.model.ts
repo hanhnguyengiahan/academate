@@ -36,12 +36,19 @@ const UserSchema = new mongoose.Schema({
     },
   ],
 
-  requests: [
+  sent_requests: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'FriendRequest',
     },
   ],
+  
+  received_requests: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'FriendRequest',
+    }
+  ]
 });
 const User = mongoose.model('User', UserSchema);
 export default User;
