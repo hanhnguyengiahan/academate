@@ -11,9 +11,11 @@ const MatchingCardSchema = new mongoose.Schema({
     enum: ['HD', 'D', 'CR', 'PS'],
   },
 
-  objective: {
-    type: String,
-  },
+  objective: [
+    {
+      type: String,
+    },
+  ],
 
   userId: {
     type: mongoose.Schema.Types.ObjectId,
