@@ -14,6 +14,7 @@ import mongoose from 'mongoose';
 // import routes
 import userRoute from '../routes/user.route';
 import authRoute from '../routes/auth.route';
+import matchingCardRoute from '../routes/matching_card.route';
 
 // Setup dotenv file
 dotenv.config();
@@ -47,6 +48,7 @@ app.use(errorHandler());
 // use routes
 app.use('/auth', authRoute);
 app.use('/user', userRoute);
+app.use('/match', matchingCardRoute);
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================

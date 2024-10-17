@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const MatchingCard = new mongoose.Schema({
+const MatchingCardSchema = new mongoose.Schema({
   course_code: {
     type: String,
     required: true,
@@ -8,12 +8,18 @@ const MatchingCard = new mongoose.Schema({
 
   grade: {
     type: String,
-    enum: ['HD', 'D', 'CR', 'PS']
+    enum: ['HD', 'D', 'CR', 'PS'],
   },
 
   objective: {
-    type: String
-  }
+    type: String,
+  },
+
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
 });
+const MatchingCard = mongoose.model('MatchingCard', MatchingCardSchema);
 
 export default MatchingCard;
