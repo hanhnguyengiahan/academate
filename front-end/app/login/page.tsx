@@ -22,16 +22,39 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const navigation = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Here you would typically handle the login logic
     // For this example, we'll just show an error if the fields are empty
     if (!email || !password) {
       setError("Please fill in all fields");
-    } else {
-      setError("");
-      console.log("Login attempted with:", { email, password });
-      navigation.push("/dashboard")
+      return;
+    }
+    setError("");
+    console.log("Login attempted with:", { email, password });
+    try {
+      const response = await fetch("http://localhost:52533/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      if (response.ok) {
+        await response.json().then((data) => {
+          localStorage.setItem("academateToken", data.token);
+        });
+        navigation.push("/dashboard");
+      } else {
+        const data = await response.json();
+        setError(data.message);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unknown error occurred");
+      }
     }
   };
 
