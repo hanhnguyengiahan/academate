@@ -21,6 +21,10 @@ const MatchingCardSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
+
+  objectiveEmbedding: {
+    type: Array,
+  },
 });
 const MatchingCard = mongoose.model('MatchingCard', MatchingCardSchema);
 

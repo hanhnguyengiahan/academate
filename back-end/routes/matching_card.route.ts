@@ -5,6 +5,7 @@ import {
   readAllCard,
   readCard,
   updateCard,
+  matchingCards
 } from '../controllers/matching_card.controller';
 
 const router = express.Router();
@@ -14,5 +15,7 @@ router.post('/read', readCard);
 router.post('/read_all', readAllCard);
 router.put('/', updateCard);
 router.post('/delete', deleteCard);
+
+router.get('/matching', matchingCards);
 
 export default router;
