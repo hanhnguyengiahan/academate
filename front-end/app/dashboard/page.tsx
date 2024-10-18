@@ -128,7 +128,7 @@ const DashboardPageComponent = () => {
                         <li key={index}>{objective}</li>
                       ))}
                     </ul>
-                    <div className="mt-4 flex space-x-2">
+                    <div className="mt-4 flex space-x-2 z-20">
                       <Button
                         variant="outline"
                         size="sm"

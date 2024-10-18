@@ -21,7 +21,14 @@ import {
 import { PlusCircle, X } from "lucide-react";
 import { MatchingCard } from "@/app/dashboard/page";
 
-const courseCodes = ["COMP1531", "COMP2511", "COMP2521", "COMP3121", "COMP3141", "COMP1511"];
+const courseCodes = [
+  "COMP1531",
+  "COMP2511",
+  "COMP2521",
+  "COMP3121",
+  "COMP3141",
+  "COMP1511",
+];
 const grades = ["HD", "D", "CR", "PS"];
 
 interface AddMatchingCardProps {
@@ -29,7 +36,10 @@ interface AddMatchingCardProps {
   card?: MatchingCard | null;
 }
 
-export const AddMatchingCardComponent: React.FC<AddMatchingCardProps> = ({ setShow, card }) => {
+export const AddMatchingCardComponent: React.FC<AddMatchingCardProps> = ({
+  setShow,
+  card,
+}) => {
   const [courseCode, setCourseCode] = useState(card?.course_code || "");
   const [aimingGrade, setAimingGrade] = useState(card?.grade || "");
   const [objectives, setObjectives] = useState<string[]>(card?.objective || []);
@@ -43,11 +53,28 @@ export const AddMatchingCardComponent: React.FC<AddMatchingCardProps> = ({ setSh
 
     const method = card ? "PUT" : "POST";
 
+    const req = card
+      ? {
+          token,
+          course_code: courseCode,
+          grade: aimingGrade,
+          objective: objectives,
+          _id: card?._id,
+        }
+      : {
+          token,
+          course_code: courseCode,
+          grade: aimingGrade,
+          objective: objectives,
+        };
+
+    console.log(req, method);
+
     try {
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, course_code: courseCode, grade: aimingGrade, objective: objectives, _id: card?._id }),
+        body: JSON.stringify(req),
       });
 
       if (response.ok) {
@@ -62,7 +89,10 @@ export const AddMatchingCardComponent: React.FC<AddMatchingCardProps> = ({ setSh
 
   return (
     <div className="flex items-center justify-center px-4 absolute h-screen w-screen">
-      <div className="absolute inset-0 bg-gray-900 opacity-50" onClick={() => setShow(false)} />
+      <div
+        className="absolute inset-0 bg-gray-900 opacity-50"
+        onClick={() => setShow(false)}
+      />
       <Card className="w-full max-w-md mx-auto z-10">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
@@ -113,7 +143,9 @@ export const AddMatchingCardComponent: React.FC<AddMatchingCardProps> = ({ setSh
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={() => setObjectives(objectives.filter((_, i) => i !== index))}
+                    onClick={() =>
+                      setObjectives(objectives.filter((_, i) => i !== index))
+                    }
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -126,14 +158,21 @@ export const AddMatchingCardComponent: React.FC<AddMatchingCardProps> = ({ setSh
                   onChange={(e) => setNewObjective(e.target.value)}
                   placeholder="Enter a new objective"
                 />
-                <Button type="button" onClick={() => setObjectives([...objectives, newObjective])}>
+                <Button
+                  type="button"
+                  onClick={() => setObjectives([...objectives, newObjective])}
+                >
                   <PlusCircle className="h-4 w-4" />
                 </Button>
               </div>
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button variant="outline" type="button" onClick={() => setShow(false)}>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => setShow(false)}
+            >
               Cancel
             </Button>
             <Button type="submit">Save Card</Button>
