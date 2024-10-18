@@ -31,12 +31,25 @@ const UserSchema = new mongoose.Schema({
 
   friends: [
     {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+      matchingCard: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MatchingCard',
+      }
+    }
+  ],
+
+  sent_requests: [
+    {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'FriendRequest',
     },
   ],
 
-  requests: [
+  received_requests: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'FriendRequest',

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const FriendRequest = new mongoose.Schema({
+const FriendRequestSchema = new mongoose.Schema({
   sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -11,10 +11,11 @@ const FriendRequest = new mongoose.Schema({
     ref: 'User',
   },
 
-  status: {
-    type: String,
-    enum: ['Pending', 'Accepted'],
-  },
+  matchingCard : {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'MatchingCard',
+  }
 });
+const FriendRequest = mongoose.model("FriendRequest", FriendRequestSchema);
 
 export default FriendRequest;
