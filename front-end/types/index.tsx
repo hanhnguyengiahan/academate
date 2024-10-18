@@ -10,6 +10,17 @@ export type MatchingCard = {
 };
 
 export type UserData = {
-  User: User;
-  MatchingCard: MatchingCard;
+  sender: User;
+  matchingCard: MatchingCard;
+  _id: string;
+};
+
+export type Friend = {
+  course_code: {
+    course_code: string;
+  };
+  _id: string;
+  email: string;
+  gender: string;
+  name: string;
 };

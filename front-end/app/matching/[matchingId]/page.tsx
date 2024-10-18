@@ -37,8 +37,33 @@ const StudentSwipePageComponent = () => {
 
   const currentStudent = matches[currentIndex];
 
+  const sendFriendRequest = async (studentId: string) => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/send`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token, matching_card_id: studentId }),
+      }
+    );
+
+    if (response.ok) {
+      console.log("Friend request sent to:", studentId);
+    } else {
+      const errorData = await response.json();
+      console.error(errorData.message);
+    }
+  };
+
   const handleSwipe = (direction: "left" | "right") => {
     setSwipeDirection(direction);
+
+    if (direction === "right") {
+      sendFriendRequest(currentStudent._id);
+    }
+
     setTimeout(() => {
       if (currentIndex < matches.length - 1) {
         // Move to the next match if available

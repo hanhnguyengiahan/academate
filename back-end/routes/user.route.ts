@@ -8,10 +8,10 @@ import {
 } from '../controllers/user.controller';
 const router = express.Router();
 
-router.get('/friends', list_friend);
+router.post('/friends', list_friend);
 router.post('/send', send_request);
 router.post('/accept', accept_friend_request);
-router.get('/received', list_received_requests);
+router.post('/received', list_received_requests);
 router.delete('/remove', remove_current_friend);
 
 export default router;

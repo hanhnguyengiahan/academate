@@ -262,6 +262,7 @@ const list_received_requests = async (req: Request, res: Response) => {
         return {
           sender: populatedRequest.sender,
           matchingCard: populatedRequest.matchingCard,
+          _id: req,
         };
       })
     );

@@ -1,40 +1,48 @@
+'use client'
+
+import { FriendsByGroup } from "@/components/friends-by-course";
 import { UserGroupsByCourse } from "@/components/user-groups-by-course";
-import { UserData } from "@/types";
+import { Friend } from "@/types";
+import { useEffect, useState } from "react";
 
-export const mockData: UserData[] = [
-  {
-    User: { name: "Alice", gender: "Female" },
-    MatchingCard: {
-      course_code: "1511",
-      grade: "HD",
-      objective: ["Improve math", "Get higher grades"],
-    },
-  },
-  {
-    User: { name: "Bob", gender: "Male" },
-    MatchingCard: {
-      course_code: "1511",
-      grade: "D",
-      objective: ["Learn faster algorithms"],
-    },
-  },
-  {
-    User: { name: "Charlie", gender: "Non-binary" },
-    MatchingCard: {
-      course_code: "1512",
-      grade: "D",
-      objective: ["Explore advanced topics", "Publish research"],
-    },
-  },
-];
+const RequestsPage: React.FC = () => {
+  const [users, setUsers] = useState<Friend[]>([]);
+  const token = localStorage.getItem("academateToken");
 
-const FriendsPage: React.FC = () => {
+  const getFriends = async () => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/friends`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token }),
+      }
+    );
+
+    const data = await response.json();
+    console.log("tthis is from backend:", data);
+
+    if (response.ok) {
+      setUsers(data.friends);
+    } else {
+      const errorData = await response.json();
+      console.error(errorData.message);
+    }
+  };
+
+
+  useEffect(() => {
+    getFriends();
+  }, []);
+
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-6">Friends</h1>
-      <UserGroupsByCourse data={mockData} />
+      <FriendsByGroup data={users} />
     </div>
   );
 };
 
-export default FriendsPage;
+export default RequestsPage;
