@@ -77,7 +77,7 @@ const server = app.listen(PORT, HOST, () => {
 
 // Setup mongoose
 mongoose
-  .connect(process.env.DB_URI)
+  .connect(process.env.DB_URI || "")
   .then(() => console.log('Connected to MongoDB!'));
 
 // For coverage, handle Ctrl+C gracefully

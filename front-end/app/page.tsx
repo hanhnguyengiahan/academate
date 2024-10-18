@@ -4,16 +4,15 @@ import { useRouter } from "next/navigation";
 
 const Home = () => {
   const router = useRouter();
+  const token = localStorage.getItem("academateToken");
 
   useEffect(() => {
-    const token = localStorage.getItem("academateToken");
-
     if (!token) {
       router.push("/login");
     } else {
       router.push("/dashboard");
     }
-  }, []);
+  }, [token]);
   return <div></div>;
 };
 
