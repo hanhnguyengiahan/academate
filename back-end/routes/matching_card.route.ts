@@ -16,6 +16,6 @@ router.post('/read_all', readAllCard);
 router.put('/', updateCard);
 router.post('/delete', deleteCard);
 
-router.get('/matching', matchingCards);
+router.post('/matching', matchingCards);
 
 export default router;

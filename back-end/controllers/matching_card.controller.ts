@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import MatchingCard from '../models/matching_card.model';
 import Session from '../models/session.model';
+import User from '../models/user.model';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
@@ -13,7 +14,7 @@ const OPENAI_APIKEY = process.env.OPENAI_APIKEY || "";
 const DB_URI = process.env.DB_URI || "";
 
 import { MongoClient, ObjectId } from 'mongodb';
-//const client = new MongoClient(DB_URI);
+const client = new MongoClient(DB_URI);
 
 const createCard = async (req: Request, res: Response) => {
   try {
@@ -45,13 +46,14 @@ const createCard = async (req: Request, res: Response) => {
 };
 
 // Function to create vector embedding using OpenAI API
-const createVectorEmbedding = async (objective: string): Promise<number[]> => {
+const createVectorEmbedding = async (objective: string[]): Promise<number[]> => {
   try {
+    const concatenatedObjective = objective.join(' '); // Concatenate the array of strings into one string
     const response = await axios.post(
       'https://api.openai.com/v1/embeddings',
       {
         model: 'text-embedding-3-small',
-        input: objective,
+        input: concatenatedObjective,
       },
       {
         headers: {
@@ -64,7 +66,7 @@ const createVectorEmbedding = async (objective: string): Promise<number[]> => {
     const embedding = response.data.data[0].embedding;
     return embedding;
   } catch (error) {
-    throw new Error('Failed to generate embedding!');
+    throw new Error('Failed to generate embedding!!!' + error);
   }
 };
 
@@ -181,14 +183,14 @@ const matchingCards = async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Card does not exist' });
     }
 
-    //await client.connect();
+    await client.connect();
 
-    //const db = client.db('test');
+    const db = client.db('test');
 
     // Generate vector embedding for the objective
     const queryEmbed = existingCard.objectiveEmbedding;
 
-    //const collection = db.collection('matchingcards'); // Ensure this is the correct collection
+    const collection = db.collection('matchingcards'); // Ensure this is the correct collection
 
     // MongoDB vector search pipeline
     const searchPipeline = [
@@ -199,6 +201,7 @@ const matchingCards = async (req: Request, res: Response) => {
           numCandidates: 100,
           limit: 10, // Limit to top 5 similar results
           index: 'vector_index',
+          filter: { grade: existingCard.grade, course_code: existingCard.course_code }, // Filter by grade
         },
       },
       {
@@ -207,16 +210,29 @@ const matchingCards = async (req: Request, res: Response) => {
           course_code: 1,
           grade: 1,
           objective: 1,
+          userId: 1,
           similarity: { $meta: 'searchScore' }, // Get the similarity score
         },
       },
     ];
 
     // Execute the aggregation pipeline
-    //const results = await collection.aggregate(searchPipeline).toArray();
+    const results = await collection.aggregate(searchPipeline).toArray();
+
+    // Query the user collection for each result to get user name and gender
+    const enrichedResults = await Promise.all(
+      results.map(async (result) => {
+      const user = await User.findById(result.userId).lean();
+      return {
+        ...result,
+        userName: user?.name,
+        userGender: user?.gender,
+      };
+      })
+    );
 
     res.status(200).json({
-      message: 'Card deleted successfully',
+      matchingResult: enrichedResults,
     });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
